@@ -1,0 +1,122 @@
+---
+// Import statements at build time
+import 'lightgallery/css/lightgallery.css';
+import 'lightgallery/css/lg-zoom.css';
+import 'lightgallery/css/lg-thumbnail.css';
+import { getGalleryImages } from '../utils/galleryUtils';
+
+// Get all images
+const images = await getGalleryImages();
+---
+
+<section id="gallery" class="py-20 bg-nature-50 dark:bg-earth-800">
+  <div class="container mx-auto px-4">
+    <h2 class="text-4xl font-bold text-center mb-12 text-earth-900 dark:text-nature-50">Featured Work</h2>
+    
+    <div id="lightgallery" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {images.map((image) => (
+        <a 
+          data-lg-size="1600-1067"
+          class="gallery-item overflow-hidden rounded-lg shadow-lg bg-white dark:bg-earth-700 cursor-pointer"
+          data-src={image.src}
+          data-sub-html={`<h4>${image.title}</h4><p>${image.description}</p>`}
+        >
+          <img
+            src={image.thumb}
+            alt={image.alt}
+            class="w-full h-64 object-cover transform hover:scale-105 transition-transform duration-300"
+            loading="lazy"
+          />
+        </a>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+  // Dynamic imports for client-side execution
+  const initGallery = async () => {
+    const { default: lightGallery } = await import('lightgallery');
+    const { default: lgThumbnail } = await import('lightgallery/plugins/thumbnail');
+    const { default: lgZoom } = await import('lightgallery/plugins/zoom');
+
+    const galleryElement = document.getElementById('lightgallery');
+    if (galleryElement) {
+      const gallery = lightGallery(galleryElement, {
+        plugins: [lgZoom, lgThumbnail],
+        speed: 500,
+        selector: '.gallery-item',
+        download: false,
+        thumbnail: true,
+        zoomFromOrigin: false,
+        allowMediaOverlap: true,
+        toggleThumb: true,
+        hideScrollbar: true,
+        mobileSettings: {
+          controls: true,
+          showCloseIcon: true,
+          download: false
+        }
+      });
+
+      // Refresh gallery when new images are added
+      document.addEventListener('galleryUpdated', () => {
+        gallery.refresh();
+      });
+    }
+  };
+
+  // Initialize gallery when the page loads
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initGallery);
+  } else {
+    initGallery();
+  }
+</script>
+
+<style is:global>
+  /* Custom styles for lightgallery */
+  .lg-backdrop {
+    background-color: rgba(0, 0, 0, 0.9) !important;
+  }
+
+  .lg-toolbar,
+  .lg-prev,
+  .lg-next {
+    background-color: transparent !important;
+  }
+
+  .lg-toolbar .lg-icon,
+  .lg-prev:after,
+  .lg-next:after {
+    color: white !important;
+  }
+
+  .lg-thumb-outer {
+    background-color: rgba(0, 0, 0, 0.9) !important;
+  }
+
+  .lg-thumb-item {
+    border: 2px solid transparent !important;
+  }
+
+  .lg-thumb-item.active,
+  .lg-thumb-item:hover {
+    border-color: #22c55e !important;
+  }
+
+  .lg-sub-html {
+    background: rgba(0, 0, 0, 0.7) !important;
+  }
+
+  .lg-sub-html h4 {
+    color: #fff !important;
+    font-size: 1.25rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .lg-sub-html p {
+    color: #d1d5db !important;
+    font-size: 1rem !important;
+  }
+</style>
