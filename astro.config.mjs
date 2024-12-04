@@ -8,4 +8,13 @@ export default defineConfig({
     sitemap(),
   ],
   site: 'https://your-domain.com',
+  image: {
+    service: {
+      entrypoint: 'sharp',
+      config: {
+        quality: 80,
+        format: ['webp', 'avif', 'jpeg'],
+      }
+    }
+  }
 });
