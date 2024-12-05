@@ -6,6 +6,16 @@ export interface GalleryImage {
   description: string;
 }
 
+// Fisher-Yates shuffle algorithm
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
 export async function getGalleryImages(): Promise<GalleryImage[]> {
   const images: GalleryImage[] = [];
   
@@ -31,9 +41,9 @@ export async function getGalleryImages(): Promise<GalleryImage[]> {
   }
 
   // Sort images by filename
-  return images.sort((a, b) => {
+  return shuffleArray(images.sort((a, b) => {
     const aNum = parseInt(a.src.split('/').pop()?.split('.')[0] || '0');
     const bNum = parseInt(b.src.split('/').pop()?.split('.')[0] || '0');
     return aNum - bNum;
-  });
+  }));
 }
